@@ -1,13 +1,14 @@
 // ==========================================
-// APINMC ZONE — SCRIPT.JS
+// APINMC ZONE — SCRIPT.JS LENGKAP
 // ==========================================
 
 let allSkins = [];
 let allAddons = [];
 let allGames = [];
-let allInfo = [];
+let allInfo = {};
 let currentSkinFilter = 'semua';
 let currentAddonFilter = 'semua';
+let currentPreviewData = {};
 
 document.addEventListener('DOMContentLoaded', () => {
     initNavigation();
@@ -35,17 +36,24 @@ function initNavigation() {
 // ---------- MUAT SEMUA DATA ----------
 async function loadAllData() {
     try {
-        const [skinsRes, addonsRes, gamesRes, infoRes] = await Promise.all([
+        const [skinsRes, gamesRes, infoRes] = await Promise.all([
             fetch('skins.json'),
-            fetch('addons.json'),
             fetch('games.json'),
             fetch('data.json')
         ]);
         
         allSkins = await skinsRes.json();
-        allAddons = await addonsRes.json();
         allGames = await gamesRes.json();
         allInfo = await infoRes.json();
+        
+        // Coba muat addons.json secara terpisah
+        try {
+            const addonsRes = await fetch('addons.json');
+            allAddons = await addonsRes.json();
+        } catch (e) {
+            console.log('addons.json belum tersedia');
+            allAddons = [];
+        }
         
         renderSkins();
         renderAddons();
@@ -61,7 +69,7 @@ async function loadAllData() {
 
 function showErrorHint() {
     document.getElementById('skinList').innerHTML = 
-        '<p class="empty">Cek file skins.json, addons.json, games.json, dan data.json ya</p>';
+        '<p class="empty">Cek file JSON kamu ya</p>';
 }
 
 // ---------- FILTER KATEGORI ----------
@@ -93,7 +101,7 @@ function renderSkins() {
     let data = allSkins;
     
     if (currentSkinFilter !== 'semua') {
-        data = allSkins.filter(s => s.jenis === currentSkinFilter);
+        data = allSkins.filter(s => s.kategori === currentSkinFilter);
     }
     
     if (!data.length) {
@@ -103,12 +111,12 @@ function renderSkins() {
     
     grid.innerHTML = data.map(skin => `
         <div class="card">
-            <img src="${skin.img}" alt="${skin.nama}" class="card-img" loading="lazy">
+            <img src="${skin.gambar}" alt="${skin.tag}" class="card-img" loading="lazy">
             <div class="card-body">
-                <h3 class="card-title">${skin.nama}</h3>
+                <h3 class="card-title">${skin.tag}</h3>
                 <div class="card-buttons">
-                    <button class="btn secondary" onclick="openPreview('${skin.img}', '${skin.nama}', '${skin.deskripsi || ''}', '${skin.file || ''}')">Preview</button>
-                    <a href="${skin.file || '#'}" target="_blank" class="btn primary" style="${!skin.file ? 'opacity:0.6;pointer-events:none;' : ''}">Unduh</a>
+                    <button class="btn secondary" onclick="openPreview('${skin.gambar}', '${skin.tag}', '${(skin.deskripsi || '').replace(/'/g, "\\'")}', '${skin['link-download'] || ''}')">Preview</button>
+                    <a href="${skin['link-download'] || '#'}" target="_blank" class="btn primary" style="${!skin['link-download'] ? 'opacity:0.6;pointer-events:none;' : ''}">Unduh</a>
                 </div>
             </div>
         </div>
@@ -125,21 +133,21 @@ function renderAddons() {
     }
     
     if (!data.length) {
-        list.innerHTML = '<p class="empty">Belum ada addon di kategori ini</p>';
+        list.innerHTML = '<p class="empty">Belum ada addon</p>';
         return;
     }
     
     list.innerHTML = data.map(addon => `
         <div class="addon-card">
-            <img src="${addon.img}" alt="${addon.nama}" class="addon-img" loading="lazy">
+            <img src="${addon.gambar}" alt="${addon.nama}" class="addon-img" loading="lazy">
             <div class="addon-body">
                 <div>
                     <h3 class="addon-title">${addon.nama}</h3>
                     <p class="addon-desc">${addon.deskripsi || ''}</p>
                 </div>
                 <div class="card-buttons">
-                    <button class="btn secondary" onclick="openPreview('${addon.img}', '${addon.nama}', '${addon.deskripsi || ''}', '${addon.file || ''}')">Preview</button>
-                    <a href="${addon.file || '#'}" target="_blank" class="btn primary" style="${!addon.file ? 'opacity:0.6;pointer-events:none;' : ''}">Unduh</a>
+                    <button class="btn secondary" onclick="openPreview('${addon.gambar}', '${addon.nama}', '${(addon.deskripsi || '').replace(/'/g, "\\'")}', '${addon['link-download'] || ''}')">Preview</button>
+                    <a href="${addon['link-download'] || '#'}" target="_blank" class="btn primary" style="${!addon['link-download'] ? 'opacity:0.6;pointer-events:none;' : ''}">Unduh</a>
                 </div>
             </div>
         </div>
@@ -170,27 +178,70 @@ function renderGames() {
 function renderInfo() {
     const container = document.getElementById('infoContent');
     
-    if (!allInfo.sections || !allInfo.sections.length) {
+    if (!allInfo) {
         container.innerHTML = '<p class="empty">Belum ada informasi</p>';
         return;
     }
     
-    container.innerHTML = allInfo.sections.map(sec => `
+    let html = '';
+    
+    // Bagian Beranda
+    if (allInfo.beranda) {
+        html += `
         <div class="info-section">
-            <h4>${sec.judul}</h4>
-            ${sec.item.map(i => `
+            <h4>${allInfo.beranda.judul || 'Beranda'}</h4>
+            <p style="font-size:14px;line-height:1.6;">${allInfo.beranda.deskripsi || ''}</p>
+        </div>`;
+    }
+    
+    // Bagian Saluran
+    if (allInfo.saluran && allInfo.saluran.length) {
+        html += `
+        <div class="info-section">
+            <h4>Saluran Kami</h4>
+            ${allInfo.saluran.map(item => `
                 <div class="info-item">
-                    <span>${i.nama}</span>
-                    <a href="${i.link}" target="_blank">Buka →</a>
+                    <span>${item.nama}</span>
+                    <a href="${item.link}" target="_blank">Buka →</a>
                 </div>
             `).join('')}
-        </div>
-    `).join('');
+        </div>`;
+    }
+    
+    // Bagian Dukungan
+    if (allInfo.dukungan && allInfo.dukungan.length) {
+        html += `
+        <div class="info-section">
+            <h4>Dukungan</h4>
+            ${allInfo.dukungan.map(item => `
+                <div class="info-item">
+                    <span>${item.nama}</span>
+                    <a href="${item.link}" target="_blank">Buka →</a>
+                </div>
+            `).join('')}
+        </div>`;
+    }
+    
+    // Bagian Tentang
+    if (allInfo.tentang) {
+        html += `
+        <div class="info-section">
+            <h4>Tentang ApinMC Zone</h4>
+            <p style="font-size:14px;line-height:1.6;">${allInfo.tentang.deskripsi || ''}</p>
+            ${allInfo.tentang.sosmed && allInfo.tentang.sosmed.length ? `
+                <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:10px;">
+                    ${allInfo.tentang.sosmed.map(item => `
+                        <a href="${item.link}" target="_blank" style="padding:6px 12px;background:#f1f5f9;border-radius:6px;color:#2563eb;text-decoration:none;font-size:13px;">${item.nama}</a>
+                    `).join('')}
+                </div>
+            ` : ''}
+        </div>`;
+    }
+    
+    container.innerHTML = html || '<p class="empty">Belum ada informasi</p>';
 }
 
 // ---------- PREVIEW MODAL ----------
-let currentPreviewData = {};
-
 function openPreview(imgSrc, title, desc, fileLink) {
     currentPreviewData = { imgSrc, title, desc, fileLink };
     const modal = document.getElementById('previewModal');
@@ -218,10 +269,12 @@ function copyLink() {
     const link = window.location.href;
     navigator.clipboard.writeText(link).then(() => {
         alert('Link disalin! ✅');
+    }).catch(() => {
+        alert('Gagal menyalin link');
     });
 }
 
 function shareWA() {
-    const text = encodeURIComponent(`${currentPreviewData.title}\n${window.location.href}`);
+    const text = encodeURIComponent((currentPreviewData.title || 'ApinMC Zone') + '\n' + window.location.href);
     window.open(`https://wa.me/?text=${text}`, '_blank');
 }
