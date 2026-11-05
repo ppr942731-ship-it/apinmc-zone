@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApinMC Zone</title>
+    <meta name="description" content="Koleksi skin, addon, dan game Minecraft gratis">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="https://files.catbox.moe/7vkqqk.jpg">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+    <div class="logo">
+        <img src="https://files.catbox.moe/7vkqqk.jpg" alt="ApinMC Zone">
+        <span>ApinMC Zone</span>
+    </div>
+</header>
+
+<!-- NAVIGASI -->
+<nav class="bottom-nav">
+    <button class="nav-item active" data-page="skin">
+        <span>🎨</span>
+        <label>Skin</label>
+    </button>
+    <button class="nav-item" data-page="addon">
+        <span>📦</span>
+        <label>Addon</label>
+    </button>
+    <button class="nav-item" data-page="game">
+        <span>🎮</span>
+        <label>Game</label>
+    </button>
+    <button class="nav-item" data-page="info">
+        <span>ℹ️</span>
+        <label>Info</label>
+    </button>
+</nav>
+
+<!-- KONTEN UTAMA -->
+<main id="app">
+    <!-- HALAMAN SKIN -->
+    <section id="skinPage" class="page active">
+        <div class="container">
+            <h2>Koleksi Skin</h2>
+            <p class="subtitle">Gratis, langsung unduh tanpa ribet</p>
+            
+            <div class="filters">
+                <button class="filter-btn active" data-filter="semua">Semua</button>
+                <button class="filter-btn" data-filter="cowok">Cowok</button>
+                <button class="filter-btn" data-filter="cewek">Cewek</button>
+                <button class="filter-btn" data-filter="pvp">PVP</button>
+                <button class="filter-btn" data-filter="pack">Skin Pack</button>
+                <button class="filter-btn" data-filter="emote">Emote</button>
+                <button class="filter-btn" data-filter="jj">Skin JJ</button>
+                <button class="filter-btn" data-filter="couple">Skin Couple</button>
+            </div>
+            
+            <div class="grid" id="skinList">
+                <p class="loading">Memuat data...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- HALAMAN ADDON -->
+    <section id="addonPage" class="page">
+        <div class="container">
+            <h2>Koleksi Addon</h2>
+            <p class="subtitle">Addon, resource pack, dan lainnya</p>
+            
+            <div class="filters">
+                <button class="filter-btn active" data-filter="semua">Semua</button>
+                <button class="filter-btn" data-filter="addon">Addon</button>
+                <button class="filter-btn" data-filter="maps">Maps</button>
+                <button class="filter-btn" data-filter="horor">Horor</button>
+                <button class="filter-btn" data-filter="survival">Survival</button>
+            </div>
+            
+            <div class="list" id="addonList">
+                <p class="loading">Memuat data...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- HALAMAN GAME -->
+    <section id="gamePage" class="page">
+        <div class="container">
+            <h2>Mini Game & Alat</h2>
+            <p class="subtitle">Mainkan langsung di sini</p>
+            
+            <div class="grid" id="gameList">
+                <p class="loading">Memuat data...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- HALAMAN INFO -->
+    <section id="infoPage" class="page">
+        <div class="container">
+            <h2>Tentang ApinMC Zone</h2>
+            <div id="infoContent">
+                <p class="loading">Memuat informasi...</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- MODAL PREVIEW -->
+<div id="previewModal" class="modal">
+    <div class="modal-box">
+        <button class="close-btn" onclick="closePreview()">&times;</button>
+        <h3 id="previewTitle">Preview</h3>
+        <img id="previewImage" src="" alt="Preview">
+        <p id="previewDesc"></p>
+        <div class="modal-buttons">
+            <a id="previewDownload" href="" target="_blank" class="btn primary">⬇️ Unduh</a>
+            <button class="btn secondary" onclick="copyLink()">🔗 Salin Link</button>
+            <button class="btn secondary" onclick="shareWA()">💬 Share WA</button>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
