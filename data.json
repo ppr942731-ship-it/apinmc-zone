@@ -11,7 +11,7 @@
     "judul": "Ikuti di Sosmed",
     "deskripsi": "Kunjungi dan beri dukungan",
     "daftar": [
-      { "nama": "TikTok", "link": "tautan-kamu" },
+      { "nama": "TikTok", "link": "https://tiktok.com/@apinnmc" },
       { "nama": "Instagram", "link": "tautan-kamu" }
     ]
   },
